@@ -5,6 +5,10 @@ const pkg = require('./package.json');
 const { Message, RichEmbed, Client } = Discord;
 const client = new Client();
 
+process.on('unhandledRejection', (r, p) => {
+  console.log(r);
+});
+
 function embedify(message, color = '#F8F8F8') {
   const embed = new RichEmbed()
     .setColor(color)
@@ -246,6 +250,11 @@ async function doHelp() {
 }
 
 client.on('ready', () => {
+  client.user.setPresence({
+    game: {
+      name: '>help',
+    },
+  });
   console.log('logged in');
 });
 
