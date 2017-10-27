@@ -238,6 +238,7 @@ async function doDisallow(msg, text) {
 async function doHelp() {
   return [
     `rolebot v${pkg.version}`,
+    '[source code](https://github.com/sthom.kiwi/rolebot)'
     '',
     'available commands:',
     '`>list`: list roles you can add/remove using this bot',
