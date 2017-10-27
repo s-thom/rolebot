@@ -178,6 +178,12 @@ async function doAllow(msg, text) {
 
   const conf = await readConfig();
 
+  const isOverlord = conf.overlords.indexOf(msg.author.id) > -1;
+  const isAdmin = msg.member.hasPermission('MANAGE_GUILD');
+  if (!(isOverlord || isAdmin)) {
+    return 'you do not have permission to allow new roles';
+  }
+
   if (!conf.servers[msg.guild.id]) {
     conf.servers[msg.guild.id] = {
       allowed: [],
@@ -212,6 +218,12 @@ async function doDisallow(msg, text) {
 
   const conf = await readConfig();
 
+  const isOverlord = conf.overlords.indexOf(msg.author.id) > -1;
+  const isAdmin = msg.member.hasPermission('MANAGE_GUILD');
+  if (!(isOverlord || isAdmin)) {
+    return 'you do not have permission to disallow roles';
+  }
+
   if (!conf.servers[msg.guild.id]) {
     return 'server not set up';
   }
@@ -238,7 +250,7 @@ async function doDisallow(msg, text) {
 async function doHelp() {
   return [
     `rolebot v${pkg.version}`,
-    '[source code](https://github.com/sthom.kiwi/rolebot)'
+    '[source code](https://github.com/sthom.kiwi/rolebot)',
     '',
     'available commands:',
     '`>list`: list roles you can add/remove using this bot',
