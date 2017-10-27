@@ -13,15 +13,26 @@ function embedify(message, color = '#F8F8F8') {
   return embed;
 }
 
-function send(target, message) {
-  let embed;
-  if (message instanceof RichEmbed) {
-    embed = message;
+async function send(target, message) {
+  let m;
+  if (message instanceof Promise) {
+    m = await message;
   } else {
-    embed = embedify(message);
+    m = message;
+  }
+  let embed;
+  if (m instanceof RichEmbed) {
+    embed = m;
+  } else {
+    embed = embedify(m);
   }
 
-  target.send('', { embed });
+  console.log(`< ${embed.description}`);
+
+  return target.send('', { embed })
+    .catch((err) => {
+      console.error(err);
+    });
 }
 
 function readConfig() {
@@ -88,11 +99,11 @@ async function doJoin(msg, text) {
     return 'no roles have been added. a server admin needs to use `>allow`';
   }
 
-  if (!conf.servers[msg.guild.id].allowed.includes(text)) {
+  if (conf.servers[msg.guild.id].allowed.indexOf(text) === -1) {
     return `${text} is not an allowed role. use \`>list\` to view the roles`;
   }
 
-  const { roles } = client.guilds.find(msg.guild.id);
+  const { roles } = client.guilds.get(msg.guild.id);
   const role = roles.find('name', text);
 
   if (!role) {
@@ -129,11 +140,11 @@ async function doLeave(msg, text) {
     return 'no roles have been added. a server admin needs to use `>allow`';
   }
 
-  if (!conf.servers[msg.guild.id].allowed.includes(text)) {
+  if (conf.servers[msg.guild.id].allowed.indexOf(text) === -1) {
     return `${text} is not an allowed role. use \`>list\` to view the roles`;
   }
 
-  const { roles } = client.guilds.find(msg.guild.id);
+  const { roles } = client.guilds.get(msg.guild.id);
   const role = roles.find('name', text);
 
   if (!role) {
@@ -164,13 +175,12 @@ async function doAllow(msg, text) {
   const conf = await readConfig();
 
   if (!conf.servers[msg.guild.id]) {
-    return 'server not set up';
-  }
-  if (!conf.servers[msg.guild.id].allowed.length) {
-    return 'no roles have been added. a server admin needs to use `>allow`';
+    conf.servers[msg.guild.id] = {
+      allowed: [],
+    };
   }
 
-  if (conf.servers[msg.guild.id].allowed.includes(text)) {
+  if (conf.servers[msg.guild.id].allowed.indexOf(text) > -1) {
     return `${text} has already been added`;
   }
 
@@ -205,7 +215,7 @@ async function doDisallow(msg, text) {
     return 'no roles have been added. a server admin needs to use `>allow`';
   }
 
-  if (!conf.servers[msg.guild.id].allowed.includes(text)) {
+  if (conf.servers[msg.guild.id].allowed.indexOf(text) === -1) {
     return `${text} wasn't in the list, so i guess it's removed?`;
   }
 
@@ -244,6 +254,8 @@ client.on('message', (msg) => {
   if (!match) {
     return;
   }
+
+  console.log(`> ${msg.author.username}: ${msg.content}`);
 
   // There's a command-like string, so check if in server
   if (!msg.guild) {
