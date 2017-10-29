@@ -272,7 +272,7 @@ client.on('ready', () => {
 });
 
 client.on('message', (msg) => {
-  const match = msg.content.match(/>(\S+)(?: (.*))?/);
+  const match = msg.content.match(/^>(\S+)(?: (.*))?/);
   if (!match) {
     return;
   }
