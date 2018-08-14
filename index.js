@@ -262,6 +262,16 @@ async function doHelp() {
   ].join('\n');
 }
 
+async function doFace() {
+  const conf = await readConfig();
+
+  if (!conf.faces) {
+    return 'whoever wrote this bot did a bad job and hasn\'t configured it correctly';
+  }
+
+  return conf.faces[Math.floor(Math.random() * conf.faces.length)];
+}
+
 client.on('ready', () => {
   client.user.setPresence({
     game: {
@@ -302,6 +312,16 @@ client.on('message', (msg) => {
       break;
     case 'help':
       send(msg.author, doHelp());
+      break;
+    case '.<':
+    case '_<':
+    case 'o<':
+    case '3<':
+    case '*<':
+    case '->':
+    case '_>':
+    case '.>':
+      send(msg.author, doFace());
       break;
     default:
       send(msg.channel, 'that\'s not a command');
