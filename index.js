@@ -321,7 +321,7 @@ client.on('message', (msg) => {
     case '->':
     case '_>':
     case '.>':
-      send(msg.author, doFace());
+      send(msg.channel, doFace());
       break;
     default:
       send(msg.channel, 'that\'s not a command');
